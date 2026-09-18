@@ -1,0 +1,50 @@
+## 训练页对话中
+
+顶部：场景描述 + 训练目标（可折叠）
+中间：对话历史（用户右，AI 左）
+底部：输入框 + 发送按钮
+右上角：提前结束按钮
+
+自然结束提示：在对话流中插入一条系统提示（浅色背景）：
+“对方情绪已经缓和，对话可以在这里收。”
+[继续练一轮] [进入复盘]
+
+强制结束：达到 max_turns 时，直接进入复盘，提示“本轮已达最大轮数，进入复盘。”
+提前结束：用户点“提前结束”，直接进入复盘，标记 early_exit=true。
+
+## /api/chat
+
+方法：POST
+请求体：{ "scene_card": SceneCard, "history": Message[] }
+响应：{ "reply": "AI 回应文本" }
+逻辑：调用硅基流动 API，使用 CHAT_PROMPT + 场景专属约束，temperature=0.8。
+
+## /api/judge-end
+
+方法：POST
+请求体：{ scene_type, turn_count, min_turns, max_turns, training_goal, history, user_last, ai_last }
+响应：{ "end_judgment": EndJudgment }
+逻辑：调用硅基流动 API，使用 JUDGE_END_PROMPT，temperature=0.3（保持稳定）。
+
+## 结束点判断规则
+
+- 如果 turn_count < min_turns：natural_end=false，end_type="none"
+- 如果 turn_count >= max_turns：natural_end=true，end_type="force"
+- 如果 turn_count >= min_turns 且场景特定条件满足：natural_end=true，end_type="natural"
+- 否则：natural_end=false，end_type="none"
+
+场景特定条件：
+- 幽默感：是否出现“接受+叠加”；对方是否接住；继续聊是否会尬。
+- 结构化表达：是否给出结论；AI追问是否被回应；核心信息是否覆盖。
+- 高情商回复：情绪温度是否下降；问题是否推进；是否出现至少一次非防御性回应；对方攻击峰值是否已过。
+
+## 对话历史长度控制
+
+发送给 AI 的 history 最多保留最近 10 轮，超出时截断最早的（保留 system prompt 中的场景信息）。
+
+## 交互细节
+
+- AI 回应中：用户消息下方显示“对方正在输入…”
+- API 失败：显示“网络出问题了，[重试]”
+- 用户输入为空：发送按钮禁用
+- 移动端键盘弹出时，对话区自动滚动到底部

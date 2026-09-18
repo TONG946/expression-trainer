@@ -1,0 +1,61 @@
+## 技术栈与部署
+
+| 层级 | 选型 | 说明 |
+|------|------|------|
+| 框架 | Next.js 14（App Router）+ TypeScript | 前后端一体，API Route 做代理 |
+| 样式 | Tailwind CSS | 简洁专业风 |
+| 状态管理 | React useState/useReducer + Zustand（跨页面状态） | 轻量 |
+| 数据存储 | 浏览器 localStorage | 无后端数据库 |
+| AI 接口 | 硅基流动 API（OpenAI 兼容格式） | 默认模型 deepseek-ai/DeepSeek-V3 |
+| 部署 | Vercel | 环境变量存 API Key |
+
+## 环境变量
+
+SILICONFLOW_API_KEY=用户自己的key
+SILICONFLOW_BASE_URL=https://api.siliconflow.cn/v1
+SILICONFLOW_MODEL=deepseek-ai/DeepSeek-V3
+
+所有 AI 调用通过 Next.js API Route 代理，前端不暴露 Key。
+
+## 响应式要求
+
+- 移动端优先（≥375px）
+- 桌面端适配（≤1200px 居中内容区）
+- 对话界面在移动端全屏，桌面端居中卡片
+
+## 文件结构
+
+/app
+  /page.tsx                    — 首页
+  /train/[sceneType]/page.tsx  — 训练页
+  /replay/[sessionId]/page.tsx — 复盘页
+  /history/page.tsx            — 历史页
+  /api
+    /generate-scene/route.ts
+    /chat/route.ts
+    /judge-end/route.ts
+    /replay/route.ts
+/lib
+  /types.ts                    — 类型定义
+  /prompts.ts                  — Prompt 模板
+  /theory-library.ts           — 理论库
+  /storage.ts                  — localStorage 操作
+  /api-client.ts               — 前端调用 API 的封装
+/components
+  /SceneCard.tsx
+  /ChatBubble.tsx
+  /ChatInput.tsx
+  /EndPrompt.tsx
+  /ReplayCard.tsx
+  /HistoryList.tsx
+  /LoadingSkeleton.tsx
+  /ErrorRetry.tsx
+
+## API Route 统一错误处理
+
+所有 API Route 返回格式：
+{ "success": true, "data": { ... } }
+或
+{ "success": false, "error": "错误信息" }
+
+前端统一处理 loading / error 状态。

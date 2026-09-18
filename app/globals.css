@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background-rgb: 248, 250, 252;
+  --foreground-rgb: 15, 23, 42;
+}
+
+html {
+  /* 注意：不要给 html/body 设 height:100%。那会限制文档高度，
+     在部分移动浏览器上导致页面滚不到最底部、底部内容被系统栏遮住。 */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+  /* 移动端优先：默认铺满整屏 */
+  width: 100%;
+  min-height: 100vh; /* 老浏览器降级 */
+  min-height: 100dvh;
+}
+
+/* 全屏高度（vh 降级 → dvh，规避移动端地址栏/键盘导致的遮挡） */
+.h-dvh {
+  height: 100vh;
+  height: 100dvh;
+}
+
+.min-h-dvh {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* 桌面端内容区居中收窄 */
+.content-container {
+  @apply mx-auto w-full max-w-content px-4 py-6;
+}
+
+/* 底部安全区：适配 iPhone 刘海屏 / 安卓手势条，避免底部按钮被系统导航栏遮挡 */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}

@@ -1,0 +1,84 @@
+// 全局类型定义（阶段二：按产品文档数据结构原文落实）
+
+/** API Route 统一返回格式 */
+export type ApiResponse<T> =
+  | { success: true; data: T }
+  | { success: false; error: string };
+
+export type SceneType = "humor" | "structured" | "eq";
+
+export interface Persona {
+  name: string;
+  relationship: string;
+  mood_baseline: string;
+  personality_traits: string[];
+  current_state: string;
+  humor_receptivity?: number; // 幽默场景 0-1
+  aggression_level?: number; // 高情商场景 0-1
+  patience?: number; // 结构化场景 0-1
+  underlying_need?: string;
+}
+
+export interface SceneCard {
+  scene_type: SceneType;
+  scene_description: string;
+  training_goal: string;
+  opening_line: string;
+  persona: Persona;
+  theory_tags: string[];
+  min_turns: number;
+  max_turns: number;
+}
+
+export interface Message {
+  role: "user" | "ai" | "system";
+  content: string;
+  timestamp: number;
+}
+
+export interface EndJudgment {
+  turn_count: number;
+  natural_end: boolean;
+  end_type: "natural" | "force" | "none" | "early_exit";
+  confidence: number;
+  emotion_temperature: number;
+  problem_progress: number;
+  strategy_coverage: string[];
+  avoidance_detected: boolean;
+  reason: string;
+  coach_hint: string;
+}
+
+export interface ReplaySummary {
+  quick_note: string;
+  theory_anchor: {
+    name: string;
+    source: string;
+    explanation: string;
+  };
+  comparison: {
+    dimension: string;
+    user_expression: string;
+    theory_view: string;
+  }[];
+  next_task: string;
+}
+
+export interface TrainingSession {
+  id: string;
+  scene_type: SceneType;
+  scene_card: SceneCard;
+  messages: Message[];
+  end_judgment: EndJudgment;
+  replay: ReplaySummary;
+  created_at: number;
+  early_exit: boolean;
+}
+
+export interface CorpusItem {
+  id: string;
+  scene_type: SceneType;
+  user_expression: string;
+  why_it_worked: string;
+  created_at: number;
+}
